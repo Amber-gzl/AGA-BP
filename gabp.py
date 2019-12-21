@@ -41,6 +41,8 @@ class GABPBase(object):
         print(net.state_dict())
         return net
 
+    # 输入参数是染色体，测试集输入以及真实样本值，同时还有用于还原预测值的MinMaxScaler
+    # 输出是一个numpy.array，行向量，保存每一个染色体的误差，用于计算适应度
     def get_net_predict_value(self, chrom, input_test, real_y_test, sc):
         input_test = torch.from_numpy(input_test)
         value = []
@@ -49,7 +51,7 @@ class GABPBase(object):
             y_pred = tmp_net(input_test)
             y_pred = sc.inverse_transform(y_pred.detach().numpy())
             value.append(np.sum(np.square(y_pred - real_y_test)))
-        return value
+        return np.array(value, dtype=np.float32)
 
     def __get_flatten_net(self):
         state_dict = self.bp_net.state_dict()
@@ -61,3 +63,43 @@ class GABPBase(object):
         b2 = state_dict['2.bias'].numpy().reshape((1, -1))
         x = np.hstack((x, b2))
         return x
+
+    # need test! input value [i for in range(100)]; [10 for _ in range(100)]
+    def simple_ranking(self, value):
+        if value.dtpye != np.float32:
+            raise Exception("传入参数类型不是np.float32类型")
+        if len(value) != self.popsize:
+            raise NotImplementedError("目前还没有实现这种情况的处理")
+        # 走到这里预计value已经被正确处理了，里面的缺省值应该是某些预设的值，否则value的类型不会是np.float32，但缺省值不正确会导致程序难以调试
+        ix = np.argsort(-value)
+        sorted_value = value[ix]
+        helpper = np.array([i for i in range(self.popsize)], dtype=np.float32)
+        helpper = 2 * helpper/(self.popsize - 1)
+        start = 0
+        end = 1
+        fit_value = None
+        while end < self.popsize:
+            if np.equal(sorted_value[start], sorted_value[end]):
+                end += 1
+                continue
+            # sorted_value[start] != sorted_value[end] [start, end), end没有被处理，所以start = end
+            tmp_result = np.sum(helpper[start:end]) * np.ones(end - start, dtype=np.float32)/(end - start)
+            if fit_value is None:
+                fit_value = tmp_result
+            else:
+                fit_value = np.hstack((fit_value, tmp_result))
+            start = end
+            end = start + 1
+
+        if not (start < self.popsize and end == self.popsize):
+            raise Exception("没想到吧?")
+
+        tmp_result = np.sum(helpper[start:end]) * np.ones(end - start, dtype=np.float32) / (end - start)
+        if fit_value is None:
+            fit_value = tmp_result
+        else:
+            fit_value = np.hstack((fit_value, tmp_result))
+        # Finally, return unsorted vector.
+        uix = np.argsort(ix)
+        fit_value = fit_value[uix]
+        return fit_value
