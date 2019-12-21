@@ -66,7 +66,7 @@ class GABPBase(object):
 
     # need test! input value [i for in range(100)]; [10 for _ in range(100)]
     def simple_ranking(self, value):
-        if value.dtpye != np.float32:
+        if value.dtype != np.float32:
             raise Exception("传入参数类型不是np.float32类型")
         if len(value) != self.popsize:
             raise NotImplementedError("目前还没有实现这种情况的处理")
