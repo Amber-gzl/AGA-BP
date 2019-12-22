@@ -4,6 +4,8 @@ import numpy as np
 
 from ga.gabp import GABPBase
 
+import math
+
 
 class GA(GABPBase):
     def __init__(self, bp_net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC):
@@ -26,31 +28,14 @@ class GA(GABPBase):
             fit_value[len(fit_value) - 1] = 1
 
     def selection(self, pop, fit_value):
-        if len(pop) != self.popsize:
-            raise Exception("len of pop error")
-        newfit_value = []
-        # 适应度总和
-        total_fit = sum(fit_value)
-        for i in range(len(fit_value)):
-            newfit_value.append(fit_value[i] / total_fit)
-        # 计算累计概率
-        self.cumsum(newfit_value)
-        ms = []
-        pop_len = len(pop)
-        for i in range(pop_len):
-            ms.append(random.random())
-        ms.sort()
-        fitin = 0
-        newin = 0
-        newpop = pop
-        # 转轮盘选择法
-        while newin < pop_len:
-            if (ms[newin] < newfit_value[fitin]):
-                newpop[newin] = pop[fitin]
-                newin = newin + 1
-            else:
-                fitin = fitin + 1
-        pop = newpop
+        pop_row = pop.shape[0]
+        nsel = max(pop_row, 2)
+        selch = []
+        fitvsub = fit_value[0:pop_row+1]
+        chrix = self.simple_ranking(self, fitvsub, nsel)
+        selch = [selch, pop[chrix:]]
+        return selch
+
 
     def mutation_ga(self, pop):
         lb = [-1]*self.N
@@ -87,6 +72,7 @@ class GA(GABPBase):
                 R2[r1:r2 + 1] = S1
                 pop[index1, :] = R1
                 pop[index2, :] = R2
+        return pop
 
 
 
