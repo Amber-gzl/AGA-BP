@@ -3,7 +3,7 @@ import torch
 
 
 class GABPBase(object):
-    def __init__(self, bp_net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC):
+    def __init__(self, bp_net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC, seed=None):
         self.bp_net = bp_net
         self.bp_net_info = {'input_number': input_number, 'hidden_number': hidden_number,
                             'output_number': output_number}
@@ -12,6 +12,7 @@ class GABPBase(object):
         self.PM = PM  # 变异概率
         self.PC = PC  # 交叉概率
         self.N = input_number * hidden_number + hidden_number + hidden_number * output_number + output_number
+        self.random_seed = seed
 
     # 产生种群染色体
     def genChrome(self):
@@ -27,7 +28,9 @@ class GABPBase(object):
         output_number = self.bp_net_info['output_number']
         w1 = x[:input_number * hidden_number].reshape((hidden_number, input_number))  # 5 * 21 = 105
         b1 = x[input_number * hidden_number: input_number * hidden_number + hidden_number].reshape((hidden_number,))
-        w2 = x[(input_number + 1) * hidden_number: (input_number + 1) * hidden_number + hidden_number * output_number].reshape((output_number, hidden_number))
+        w2 = x[(input_number + 1) * hidden_number: (
+                                                           input_number + 1) * hidden_number + hidden_number * output_number].reshape(
+            (output_number, hidden_number))
         b2 = x[-output_number:].reshape((output_number,))
         other_net = {'0.weight': torch.from_numpy(w1), '0.bias': torch.from_numpy(b1),
                      '2.weight': torch.from_numpy(w2), '2.bias': torch.from_numpy(b2)}
@@ -74,7 +77,7 @@ class GABPBase(object):
         ix = np.argsort(-value)
         sorted_value = value[ix]
         helpper = np.array([i for i in range(self.popsize)], dtype=np.float32)
-        helpper = 2 * helpper/(self.popsize - 1)
+        helpper = 2 * helpper / (self.popsize - 1)
         start = 0
         end = 1
         fit_value = None
@@ -83,7 +86,7 @@ class GABPBase(object):
                 end += 1
                 continue
             # sorted_value[start] != sorted_value[end] [start, end), end没有被处理，所以start = end
-            tmp_result = np.sum(helpper[start:end]) * np.ones(end - start, dtype=np.float32)/(end - start)
+            tmp_result = np.sum(helpper[start:end]) * np.ones(end - start, dtype=np.float32) / (end - start)
             if fit_value is None:
                 fit_value = tmp_result
             else:
@@ -103,3 +106,17 @@ class GABPBase(object):
         uix = np.argsort(ix)
         fit_value = fit_value[uix]
         return fit_value
+
+    # 实现轮盘赌算法, 返回指针, 要求fit_value是一个numpy一维数组, 返回值是索引
+    def rws(self, fit_value, number_select):
+        if fit_value.dtype != np.float32:
+            raise Exception("rws input fit_value is not np.float32")
+        if len(fit_value.shape) != 1:
+            raise Exception("rws input fit_value is not one dimension")
+        fit_value_length = fit_value.shape[0]
+        cumfit = np.cumsum(fit_value)
+        if self.random_seed is not None:
+            np.random.seed(self.random_seed)
+        trials = cumfit[fit_value_length] * np.random.rand(number_select, 1)
+        helper = np.hstack((np.zeros((number_select, 1)), cumfit[[0] * number_select][:, 0:-1]))
+        return np.argwhere(np.logical_and(cumfit > trials, helper <= trials))[:, -1]
