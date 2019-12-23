@@ -11,28 +11,13 @@ class GA(GABPBase):
     def __init__(self, bp_net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC):
         super(GA, self).__init__(bp_net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
 
-    def sum(self, fit_value):
-        total = 0
-        for i in range(len(fit_value)):
-            total += fit_value[i]
-        return total
 
-    def cumsum(self, fit_value):
-        for i in range(len(fit_value) - 2, -1, -1):
-            t = 0
-            j = 0
-            while (j <= i):
-                t += fit_value[j]
-                j += 1
-            fit_value[i] = t
-            fit_value[len(fit_value) - 1] = 1
-
-    def selection(self, pop, fit_value):
+    def select(self, pop, fit_value):
         pop_row = pop.shape[0]
         nsel = max(pop_row, 2)
         selch = []
         fitvsub = fit_value[0:pop_row+1]
-        chrix = self.simple_ranking(self, fitvsub, nsel)
+        chrix = self.rws(self, fitvsub, nsel)
         selch = [selch, pop[chrix:]]
         return selch
 
