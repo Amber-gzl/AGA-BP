@@ -15,8 +15,7 @@ class GA(GABPBase):
     def select(self, pop, fit_value):
         pop_row = pop.shape[0]
         nsel = max(pop_row, 2)
-        fitvsub = fit_value[0:pop_row+1]
-        chrix = self.rws(fitvsub, nsel)
+        chrix = self.rws(fit_value, nsel)
         selch = pop[chrix]
         return selch
 
@@ -45,8 +44,8 @@ class GA(GABPBase):
                 index2 = set2[i]
                 R1 = pop[index1]
                 R2 = pop[index1]
-                r1 = np.random.randint(1, pnumber+1)
-                r2 = np.random.randint(1, pnumber+1)
+                r1 = np.random.randint(0, pnumber)
+                r2 = np.random.randint(0, pnumber)
                 if(r1 > r2):
                     t1 = r1
                     r1 = r2
@@ -81,10 +80,10 @@ class GA(GABPBase):
 
             #记录最优
             if(gen == 0):
-                bestChrom_ga = chrom[index1, :]#记录函数1的最优染色体
+                bestChrom_ga = chrom[index1]#记录函数1的最优染色体
                 bestValue_ga = v1#记录函数1的最优值
             if(bestValue_ga > v1):
-                bestChrom_ga = chrom[index1, :]
+                bestChrom_ga = chrom[index1]
                 bestValue_ga = v1
             tracematga[gen][0] = bestValue_ga;#保留最优
             gen = gen + 1
