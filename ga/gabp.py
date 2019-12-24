@@ -118,7 +118,7 @@ class GABPBase(object):
         cumfit = np.cumsum(fit_value)  # 行向量
         if self.random_seed is not None:
             np.random.seed(self.random_seed)
-        trials = cumfit[fit_value_length - 1] * np.random.rand(number_select, 1)  # 列向量
+        trials = cumfit[fit_value_length - 1] * np.random.rand(number_select, 1)
         cumfit = cumfit.reshape((1, fit_value_length))
         helper = np.hstack((np.zeros((number_select, 1)), cumfit[[0] * number_select][:, 0:-1]))
         return np.argwhere(np.logical_and(cumfit > trials, helper <= trials))[:, -1]
