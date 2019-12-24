@@ -49,6 +49,7 @@ class GABPBase(object):
     def get_chroms_predict_value(self, chrom, input_test, real_y_test, sc):
         input_test = torch.from_numpy(input_test)
         value = []
+
         # chrom的长度不需要和popsize相同，这个函数只是根据传入的chrom返回其误差
         for i in range(chrom.shape[0]):
             tmp_net = self.recover_net(chrom[i])
