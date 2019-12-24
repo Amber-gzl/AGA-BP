@@ -41,7 +41,7 @@ class GABPBase(object):
             torch.nn.Linear(hidden_number, output_number)
         )
         net.load_state_dict(other_net)
-        print(net.state_dict())
+        # print(net.state_dict())
         return net
 
     # 输入参数是染色体，测试集输入以及真实样本值，同时还有用于还原预测值的MinMaxScaler
@@ -50,6 +50,8 @@ class GABPBase(object):
         input_test = torch.from_numpy(input_test)
         value = []
         # chrom的长度不需要和popsize相同，这个函数只是根据传入的chrom返回其误差
+        if len(chrom.shape) == 1:
+            chrom = chrom.reshape((1, chrom.shape[0]))
         for i in range(chrom.shape[0]):
             tmp_net = self.recover_net(chrom[i])
             y_pred = tmp_net(input_test)
@@ -118,8 +120,24 @@ class GABPBase(object):
         cumfit = np.cumsum(fit_value)  # 行向量
         if self.random_seed is not None:
             np.random.seed(self.random_seed)
-        trials = cumfit[fit_value_length - 1] * np.random.rand(number_select, 1)
+        trials = cumfit[fit_value_length - 1] * np.random.rand(number_select, 1)  # 列向量
         cumfit = cumfit.reshape((1, fit_value_length))
         helper = np.hstack((np.zeros((number_select, 1)), cumfit[[0] * number_select][:, 0:-1]))
         return np.argwhere(np.logical_and(cumfit > trials, helper <= trials))[:, -1]
 
+    # 这个函数完成一次交叉
+    def cross_over_once(self, chrom, index1, index2):
+        R1 = chrom[index1]
+        R2 = chrom[index2]
+        r1 = np.random.randint(0, self.N)
+        r2 = np.random.randint(0, self.N)
+        if r1 > r2:
+            t1 = r1
+            r1 = r2
+            r2 = t1
+        S1 = R1[r1:r2 + 1]
+        S2 = R2[r1:r2 + 1]
+        R1[r1:r2 + 1] = S2
+        R2[r1:r2 + 1] = S1
+        chrom[index1] = R1
+        chrom[index2] = R2

@@ -63,3 +63,13 @@ if __name__ == '__main__':
     output_number = 1#输出维度
     gaObject = GA(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
     gaObject.gafun(x_train_scaled, y_train_scaled, target_sc)
+
+     # 自适应参数
+    PM1 = 0.05  # 变异概率下限
+    PM2 = 0.25  # 变异概率上限
+    PC1 = 0.5  # 交叉概率下限
+    PC2 = 0.8  # 交叉概率上限
+    adga = AGABP(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC, None,
+                 PM1, PM2, PC1, PC2)
+    bestChrom_ga, bestValue_ga, tracematga = adga.adgafun(x_test_scaled, y_test, target_sc)
+
