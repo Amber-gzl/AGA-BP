@@ -123,4 +123,3 @@ class GABPBase(object):
         cumfit = cumfit.reshape((1, fit_value_length))
         helper = np.hstack((np.zeros((number_select, 1)), cumfit[[0] * number_select][:, 0:-1]))
         return np.argwhere(np.logical_and(cumfit > trials, helper <= trials))[:, -1]
-
