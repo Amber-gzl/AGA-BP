@@ -6,20 +6,20 @@ class GAFun(GA):
     def __init__(self, bp_net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC):
         super(GAFun, self).__init__(bp_net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
 
-    def  gafun(self, input_train, output_train, input_test, real_y_test, sc):
+    def  gafun(self, input_train, output_train, sc):
         gen = 0
-        tracematga = np.zeros(iter_max, 2)
+        tracematga = np.zeros((self.iter_max, 2))
 
-        chrom = self.genChrome(self)
-        value = self.get_net_predict_value(self, chrom, input_train, output_train, sc)
+        chrom = self.genChrome()
+        value = self.get_net_predict_value(chrom, input_train, output_train, sc)
 
         while(gen < self.iter_max):
             #遗传算法选择
-            fitnv = self.simple_ranking(self, value)
-            chrom = self.select(self, value)
-            chrom = self.mutation_ga(self, chrom)
-            chrom = self.crossover(self, chrom)
-            value = self.get_net_predict_value(self, chrom, input_train, output_train, sc)
+            fitnv = self.simple_ranking(value)
+            chrom = self.select(chrom, fitnv)
+            chrom = self.mutation_ga(chrom)
+            chrom = self.crossover(chrom)
+            value = self.get_net_predict_value(chrom, input_train, output_train, sc)
 
             #计算最优
             v1 = min(value)

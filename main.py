@@ -4,6 +4,7 @@ import torch
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from util import trainBP, plotBP, plot_net_predict_result
+from ga.gafun import GAFun
 
 if __name__ == '__main__':
     csv_data = pd.read_csv("./累计成交额含价格.csv", header=None)
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     test_set_size = 10
     hidden_number = 5  # 仅有一层隐藏层，神经元个数为5
     learning_rate = 2e-3
-    epochs = 500
+    epochs = 2
     BATCH_SIZE = 32
 
     # 获取训练集和测试集
@@ -45,9 +46,20 @@ if __name__ == '__main__':
     y_test_scaled = target_sc.transform(y_test)
 
     loss_fn = torch.nn.MSELoss(size_average=True, reduce=True)
+
     net, train_loss, test_loss = trainBP(x_train_scaled.shape[1], hidden_number, 1,
                                          learning_rate, epochs, shuffle_seed, BATCH_SIZE, loss_fn,
                                          x_train_scaled, y_train_scaled,
                                          x_test_scaled, y_test_scaled)
     plotBP(train_loss, test_loss)
     plot_net_predict_result(net, x_test_scaled, target_sc, y_test)
+
+    #遗传算法参数
+    popsize = 100; #遗传算法种群数
+    iter_max = 500; #遗传算法迭代次数
+    PM = 0.05; #变异概率
+    PC = 0.7; #交叉概率
+    input_number = 21#输入维度
+    output_number = 1#输出维度
+    gaObject = GAFun(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
+    gaObject.gafun(x_train_scaled, y_train_scaled, target_sc)

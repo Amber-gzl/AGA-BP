@@ -46,11 +46,10 @@ class GABPBase(object):
 
     # 输入参数是染色体，测试集输入以及真实样本值，同时还有用于还原预测值的MinMaxScaler
     # 输出是一个numpy.array，行向量，保存每一个染色体的误差，用于计算适应度
-    def get_chroms_predict_value(self, chrom, input_test, real_y_test, sc):
+    def get_net_predict_value(self, chrom, input_test, real_y_test, sc):
         input_test = torch.from_numpy(input_test)
         value = []
-        # chrom的长度不需要和popsize相同，这个函数只是根据传入的chrom返回其误差
-        for i in range(chrom.shape[0]):
+        for i in range(self.popsize):
             tmp_net = self.recover_net(chrom[i])
             y_pred = tmp_net(input_test)
             y_pred = sc.inverse_transform(y_pred.detach().numpy())
@@ -118,8 +117,6 @@ class GABPBase(object):
         cumfit = np.cumsum(fit_value)
         if self.random_seed is not None:
             np.random.seed(self.random_seed)
-        trials = cumfit[fit_value_length - 1] * np.random.rand(number_select, 1)
-        cumfit = cumfit.reshape((1, fit_value_length))
+        trials = cumfit[fit_value_length] * np.random.rand(number_select, 1)
         helper = np.hstack((np.zeros((number_select, 1)), cumfit[[0] * number_select][:, 0:-1]))
         return np.argwhere(np.logical_and(cumfit > trials, helper <= trials))[:, -1]
-
