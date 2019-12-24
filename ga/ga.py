@@ -17,7 +17,7 @@ class GA(GABPBase):
         nsel = max(pop_row, 2)
         selch = []
         fitvsub = fit_value[0:pop_row+1]
-        chrix = self.rws(self, fitvsub, nsel)
+        chrix = self.rws(fitvsub, nsel)
         selch = [selch, pop[chrix:]]
         return selch
 
@@ -44,7 +44,7 @@ class GA(GABPBase):
                 index1 = set1(i)
                 index2 = set2(i)
                 R1 = pop[index1, :]
-                R2 = pop[insex2, :]
+                R2 = pop[index2, :]
                 r1 = np.random.randint(1, pnumber+1)
                 r2 = np.random.randint(1, pnumber+1)
                 if(r1 > r2):
