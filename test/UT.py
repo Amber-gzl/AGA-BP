@@ -17,7 +17,7 @@ class TestGABase(unittest.TestCase):
             torch.nn.ReLU(),
             torch.nn.Linear(self.hidden_number, self.output_size)
         )
-        self.ga = GABPBase(net, self.input_size, self.hidden_number, self.output_size, 100, 500, 0.05, 0.7)
+        self.ga = GABPBase(net, self.input_size, self.hidden_number, self.output_size, 100, 500, 0.05, 0.7, seed=233)
 
     def test_simple_ranking(self):
         test_array_1 = np.array([i for i in range(1, 101)], dtype=np.float32)
@@ -30,3 +30,9 @@ class TestGABase(unittest.TestCase):
         test_array_2 = np.array(test_array_2, dtype=np.float32)
         result_2 = self.ga.simple_ranking(test_array_2)
         self.assertAlmostEqual(result_2[0], 2)
+
+    def test_rws(self):
+        test_fit_value = np.array([i for i in range(10)], dtype=np.float32)
+        nsel = 10
+        result = [4, 9, 7, 9, 6, 4, 3, 6, 8, 9]
+        self.assertEqual(self.ga.rws(test_fit_value, nsel).tolist(), result)
