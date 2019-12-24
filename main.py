@@ -4,7 +4,7 @@ import torch
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 from util import trainBP, plotBP, plot_net_predict_result
-from ga.gafun import GAFun
+from ga.ga import GA
 
 if __name__ == '__main__':
     csv_data = pd.read_csv("./累计成交额含价格.csv", header=None)
@@ -56,10 +56,10 @@ if __name__ == '__main__':
 
     #遗传算法参数
     popsize = 100; #遗传算法种群数
-    iter_max = 500; #遗传算法迭代次数
+    iter_max = 6; #遗传算法迭代次数
     PM = 0.05; #变异概率
     PC = 0.7; #交叉概率
     input_number = 21#输入维度
     output_number = 1#输出维度
-    gaObject = GAFun(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
+    gaObject = GA(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
     gaObject.gafun(x_train_scaled, y_train_scaled, target_sc)
