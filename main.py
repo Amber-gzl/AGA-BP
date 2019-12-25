@@ -52,7 +52,7 @@ if __name__ == '__main__':
                                          x_train_scaled, y_train_scaled,
                                          x_test_scaled, y_test_scaled)
     plotBP(train_loss, test_loss)
-    plot_net_predict_result(net, x_test_scaled, target_sc, y_test)
+    plot_net_predict_result('BP ', net, x_test_scaled, target_sc, y_test)
 
     #遗传算法参数
     popsize = 100; #遗传算法种群数
@@ -72,4 +72,4 @@ if __name__ == '__main__':
     adga = AGABP(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC, None,
                  PM1, PM2, PC1, PC2)
     bestChrom_ga, bestValue_ga, tracematga = adga.adgafun(x_test_scaled, y_test, target_sc)
-
+    plot_net_predict_result("AGA ", aga_net, x_test_scaled, target_sc, y_test)

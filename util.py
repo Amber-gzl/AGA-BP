@@ -61,13 +61,13 @@ def plotBP(train_loss, test_loss):
 
 
 # target_sc for inverse_transform y_pred
-def plot_net_predict_result(net, x_test_scaled, target_sc, y_test_real):
+def plot_net_predict_result(name, net, x_test_scaled, target_sc, y_test_real):
     x_test_scaled = torch.from_numpy(x_test_scaled)
     y_pred = net(x_test_scaled).detach().numpy()
     y_pred = target_sc.inverse_transform(y_pred)
     plt.plot(y_pred, color='red', label='predict value')
     plt.plot(y_test_real, color='blue', label='real value')
-    plt.title('result')
+    plt.title(name + 'result')
     plt.ylabel('price')
     plt.xlabel('sample')
     plt.legend()
