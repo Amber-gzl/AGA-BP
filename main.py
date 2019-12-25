@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import torch
 from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
+
+from ga.adga import AGABP
 from util import trainBP, plotBP, plot_net_predict_result
 from ga.ga import GA
 
@@ -22,9 +23,9 @@ if __name__ == '__main__':
     # ----------------------------BP网络超参数----------------------------
     shuffle_seed = 233
     test_set_size = 10
-    hidden_number = 5  # 仅有一层隐藏层，神经元个数为5
-    learning_rate = 2e-3
-    epochs = 2
+    hidden_number = 25  # 仅有一层隐藏层，神经元个数为5
+    learning_rate = 1e-5
+    epochs = 1000
     BATCH_SIZE = 32
 
     # 获取训练集和测试集
@@ -55,10 +56,10 @@ if __name__ == '__main__':
     plot_net_predict_result('BP ', net, x_test_scaled, target_sc, y_test)
 
     #遗传算法参数
-    popsize = 100; #遗传算法种群数
-    iter_max = 6; #遗传算法迭代次数
-    PM = 0.05; #变异概率
-    PC = 0.7; #交叉概率
+    popsize = 100 #遗传算法种群数
+    iter_max = 6 #遗传算法迭代次数
+    PM = 0.05 #变异概率
+    PC = 0.7 #交叉概率
     input_number = 21#输入维度
     output_number = 1#输出维度
     gaObject = GA(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
