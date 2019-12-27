@@ -62,9 +62,6 @@ if __name__ == '__main__':
     PC = 0.7 #交叉概率
     input_number = 21#输入维度
     output_number = 1#输出维度
-    gaObject = GA(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
-    gaObject.gafun(x_train_scaled, y_train_scaled, target_sc)
-
      # 自适应参数
     PM1 = 0.05  # 变异概率下限
     PM2 = 0.25  # 变异概率上限
@@ -73,4 +70,10 @@ if __name__ == '__main__':
     adga = AGABP(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC, None,
                  PM1, PM2, PC1, PC2)
     bestChrom_ga, bestValue_ga, tracematga = adga.adgafun(x_test_scaled, y_test, target_sc)
+    aga_net = adga.recover_net(bestChrom_ga)
     plot_net_predict_result("AGA ", aga_net, x_test_scaled, target_sc, y_test)
+
+    gaObject = GA(net, input_number, hidden_number, output_number, popsize, iter_max, PM, PC)
+    bestChrom_ga, bestValue_ga, tracematga = gaObject.gafun(x_train_scaled, y_train_scaled, target_sc)
+    ga_net = gaObject.recover_net(bestChrom_ga)
+    plot_net_predict_result("GA ", ga_net, x_test_scaled, target_sc, y_test)
